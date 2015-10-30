@@ -1,5 +1,6 @@
 __kernel void
 load_halo(__global __read_only int *image,
+          __global __read_only int *output,
           __local int *buffer,
           int w_img, int h_img,
           int w_buf, int h_buf,
@@ -13,10 +14,11 @@ load_halo(__global __read_only int *image,
     const int lx = get_local_id(0);
     const int ly = get_local_id(1);
 
-    // coordinates of the upper left corner of the buffer
+    // coordinates of the upper left corner of the buffer in image
+    // space
     const int buf_corner_x = x - lx - halo;
     const int buf_corner_y = y - ly - halo;
-    
+
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_group_size(0) + lx;
 
@@ -28,5 +30,14 @@ load_halo(__global __read_only int *image,
                 FETCH(image, w_img, h_img,
                       buf_corner_x + idx_1D,
                       buf_corner_y + row);
-        }            
+        }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // Processing code here...
+
+
+    // write output
+    output[y * w_img + x] = \
+        buffer[(ly + halo) * w_buf + (lx + halo)];
 }

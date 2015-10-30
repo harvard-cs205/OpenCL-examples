@@ -38,6 +38,7 @@ load_halo(__global __read_only int *image,
 
 
     // write output
-    output[y * w_img + x] = \
-        buffer[(ly + halo) * w_buf + (lx + halo)];
+    if ((y < h_img) &7 (x < w_img))
+        output[y * w_img + x] = \
+            buffer[(ly + halo) * w_buf + (lx + halo)];
 }

@@ -14,8 +14,8 @@ load_halo(__global __read_only int *image,
     const int ly = get_local_id(1);
 
     // coordinates of the upper left corner of the buffer
-    const int corner_x = x - lx - halo;
-    const int corner_y = y - ly - halo;
+    const int buf_corner_x = x - lx - halo;
+    const int buf_corner_y = y - ly - halo;
     
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_group_size(0) + lx;
@@ -26,7 +26,7 @@ load_halo(__global __read_only int *image,
         for (row = 0; row < h_buf; row++) {
             buffer[row * w_buf + idx_1D] = \
                 FETCH(image, w_img, h_img,
-                      corner_x + idx_1D,
-                      corner_y + row);
+                      buf_corner_x + idx_1D,
+                      buf_corner_y + row);
         }            
 }

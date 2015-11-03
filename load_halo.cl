@@ -4,7 +4,7 @@ load_halo(__global __read_only int *image,
           __local int *buffer,
           int img_w, int img_h,
           int buf_w, int buf_h,
-          const int halo)
+          const int halo) // width of halo on one side
 {
     // Global position of output pixel
     const int x = get_global_id(0);
@@ -43,7 +43,7 @@ load_halo(__global __read_only int *image,
     // Should only use buffer, buf_x, buf_y.
 
     // write output
-    if ((y < img_h) &7 (x < img_w)) // stay in bounds
+    if ((y < img_h) && (x < img_w)) // stay in bounds
         output[y * img_w + x] = \
             buffer[buf_y * buf_w + buf_x];
 }

@@ -25,8 +25,8 @@ if __name__ == '__main__':
     #
     image = np.arange(2000 * 2000).reshape((2000, 2000)).astype(np.float32)
     transposed = np.zeros_like(image)
-    print("upper left:")
-    print(image[:5, :5].astype(int))
+    print("upper row:")
+    print(image[0, :20].astype(int))
 
     #
     # allocate GPU-side memory
@@ -35,25 +35,23 @@ if __name__ == '__main__':
     gpu_transposed = cl.Buffer(context, cl.mem_flags.READ_ONLY, image.size * 4)
 
     # Workgroup sizes
-    local_size = (16, 16)  # 64 pixels per work group
+    local_size = (16, 16)
     workgroup_size = local_size[0] * local_size[1]
     global_size = tuple([round_up(g, l) for g, l in zip(image.shape[::-1], local_size)])
 
     # copy image to GPU
     cl.enqueue_copy(queue, gpu_image, image, is_blocking=False)
-
     events = []
     for i in range(251):
-        event = program.transpose_local(queue, global_size, local_size,
-                                         gpu_image, gpu_transposed,
-                                        cl.LocalMemory((workgroup_size + local_size[0]) * 4),
-                                         np.int32(2000))
+        event = program.transfer_global(queue, global_size, local_size,
+                                        gpu_image, gpu_transposed,
+                                        np.int32(2000))
         events.append(event)
 
     cl.enqueue_copy(queue, transposed, gpu_transposed, is_blocking=True)
 
-    print("upper left:")
-    print(transposed[:5, :5].astype(int))
+    print("upper row:")
+    print(transposed[0, :20].astype(int))
 
     total_time = min((event.profile.end - event.profile.start) for event in events)
     print("best time, milliseconds: {}".format(total_time / 1e6))

@@ -6,7 +6,7 @@ transfer_global(__global __read_only float *input,
     const int x = get_global_id(0);
     const int y = get_global_id(1);
 
-    if (x < get_global_size(0) && y < get_global_size(1))
+    if (x < N && y < N)
         output[y * N + x] = input[y * N + x];
 }
 
@@ -21,7 +21,7 @@ transpose_global(__global __read_only float *input,
     const int x = get_global_id(0);
     const int y = get_global_id(1);
 
-    if (x < get_global_size(0) && y < get_global_size(1))
+    if (x < N && y < N)
         output[x * N + y] = input[y * N + x];
 }
 
@@ -39,13 +39,13 @@ transpose_local(__global __read_only float *input,
     const int ly = get_local_id(1);
     const int bufsize = get_local_size(0);
 
-    if (x < get_global_size(0) && y < get_global_size(1))
+    if (x < N && y < N)
         buffer[lx * bufsize + ly] = input[y * N + x];
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    int base = (x - lx) * N + (y - ly);
-    if (x < get_global_size(0) && y < get_global_size(1))
+    const int base = (x - lx) * N + (y - ly);
+    if (x < N && y < N)
         output[base + ly * N + lx] = buffer[ly * bufsize + lx];
 }
 
@@ -61,12 +61,12 @@ transpose_local_avoid_conflict(__global __read_only float *input,
     const int ly = get_local_id(1);
     const int bufsize = get_local_size(0) + 1;
 
-    if (x < get_global_size(0) && y < get_global_size(1))
+    if (x < N && y < N)
         buffer[lx * bufsize + ly] = input[y * N + x];
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
-    int base = (x - lx) * N + (y - ly);
-    if (x < get_global_size(0) && y < get_global_size(1))
+    const int base = (x - lx) * N + (y - ly);
+    if (x < N && y < N)
         output[base + ly * N + lx] = buffer[ly * bufsize + lx];
 }

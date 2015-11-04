@@ -13,7 +13,7 @@ def round_up(global_size, group_size):
 if __name__ == '__main__':
     platforms = cl.get_platforms()
     devices = platforms[0].get_devices()
-    context = cl.Context([devices[1]])
+    context = cl.Context(devices)
     queue = cl.CommandQueue(context, context.devices[0],
                             properties=cl.command_queue_properties.PROFILING_ENABLE)
     print('The queue is using the device: {}'.format(queue.device.name))
@@ -44,8 +44,9 @@ if __name__ == '__main__':
 
     events = []
     for i in range(251):
-        event = program.transpose_global(queue, global_size, local_size,
+        event = program.transpose_local(queue, global_size, local_size,
                                          gpu_image, gpu_transposed,
+                                        cl.LocalMemory((workgroup_size + local_size[0]) * 4),
                                          np.int32(2000))
         events.append(event)
 

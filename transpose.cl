@@ -44,8 +44,9 @@ transpose_local(__global __read_only float *input,
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
+    int base = (x - lx) * N + (y - ly);
     if (x < get_global_size(0) && y < get_global_size(1))
-        output[y * N + x] = buffer[ly * bufsize + lx];
+        output[base + ly * N + lx] = buffer[ly * bufsize + lx];
 }
 
 __kernel void
@@ -65,6 +66,7 @@ transpose_local_avoid_conflict(__global __read_only float *input,
 
     barrier(CLK_LOCAL_MEM_FENCE);
 
+    int base = (x - lx) * N + (y - ly);
     if (x < get_global_size(0) && y < get_global_size(1))
-        output[y * N + x] = buffer[ly * bufsize + lx];
+        output[base + ly * N + lx] = buffer[ly * bufsize + lx];
 }

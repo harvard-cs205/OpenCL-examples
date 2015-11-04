@@ -40,6 +40,7 @@ if __name__ == '__main__':
     local_size = (16, 16)
     workgroup_size = local_size[0] * local_size[1]
     global_size = tuple([round_up(g, l) for g, l in zip(image.shape[::-1], local_size)])
+    print("Number of workgroups: {}".format(global_size[0] * global_size[1] / (local_size[0] * local_size[1])))
 
     # copy image to GPU
     cl.enqueue_copy(queue, gpu_image, image, is_blocking=False)

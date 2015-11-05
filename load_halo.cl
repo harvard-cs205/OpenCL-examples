@@ -26,7 +26,7 @@ load_halo(__global __read_only int *image,
     // 1D index of thread within our work-group
     const int idx_1D = ly * get_local_size(0) + lx;
 
-    int row, global_offset;
+    int row;
 
     if (idx_1D < buf_w)
         for (row = 0; row < buf_h; row++) {

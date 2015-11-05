@@ -24,7 +24,7 @@ load_halo(__global __read_only int *image,
     const int buf_y = ly + halo;
 
     // 1D index of thread within our work-group
-    const int idx_1D = ly * get_group_size(0) + lx;
+    const int idx_1D = ly * get_local_size(0) + lx;
 
     int row, global_offset;
 
